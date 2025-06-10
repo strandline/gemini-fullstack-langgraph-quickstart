@@ -1,9 +1,9 @@
-import { useStream } from "@langchain/langgraph-sdk/react";
-import type { Message } from "@langchain/langgraph-sdk";
-import { useState, useEffect, useRef, useCallback } from "react";
 import { ProcessedEvent } from "@/components/ActivityTimeline";
-import { WelcomeScreen } from "@/components/WelcomeScreen";
 import { ChatMessagesView } from "@/components/ChatMessagesView";
+import { WelcomeScreen } from "@/components/WelcomeScreen";
+import type { Message } from "@langchain/langgraph-sdk";
+import { useStream } from "@langchain/langgraph-sdk/react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export default function App() {
   const [processedEventsTimeline, setProcessedEventsTimeline] = useState<
@@ -45,18 +45,16 @@ export default function App() {
         const exampleLabels = uniqueLabels.slice(0, 3).join(", ");
         processedEvent = {
           title: "Web Research",
-          data: `Gathered ${numSources} sources. Related to: ${
-            exampleLabels || "N/A"
-          }.`,
+          data: `Gathered ${numSources} sources. Related to: ${exampleLabels || "N/A"
+            }.`,
         };
       } else if (event.reflection) {
         processedEvent = {
           title: "Reflection",
           data: event.reflection.is_sufficient
             ? "Search successful, generating final answer."
-            : `Need more information, searching for ${event.reflection.follow_up_queries.join(
-                ", "
-              )}`,
+            : `Need more information, searching for ${(event.reflection.follow_up_queries || []).join(", ") || "N/A"
+            }`,
         };
       } else if (event.finalize_answer) {
         processedEvent = {
@@ -156,9 +154,8 @@ export default function App() {
     <div className="flex h-screen bg-neutral-800 text-neutral-100 font-sans antialiased">
       <main className="flex-1 flex flex-col overflow-hidden max-w-4xl mx-auto w-full">
         <div
-          className={`flex-1 overflow-y-auto ${
-            thread.messages.length === 0 ? "flex" : ""
-          }`}
+          className={`flex-1 overflow-y-auto ${thread.messages.length === 0 ? "flex" : ""
+            }`}
         >
           {thread.messages.length === 0 ? (
             <WelcomeScreen
